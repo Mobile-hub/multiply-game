@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(make:*)",
+      "Bash(node:*)",
+      "Bash(python3:*)",
+      "Bash(xdg-open:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(which:*)",
+      "Bash(mkdir:*)",
+      "Bash(chromium:*)",
+      "Bash(chromium-browser:*)",
+      "Bash(google-chrome:*)",
+      "Edit(./**)",
+      "Write(./**)",
+      "Read(./**)"
+    ]
+  }
+}
