@@ -24,6 +24,9 @@
   const BOSS_SLOTS = [{ x: 96, y: 92 }, { x: 140, y: 134 }, { x: 184, y: 92 }, { x: 228, y: 134 }];
   const MUTE_RECT = { x: 305, y: 1, w: 14, h: 11 };
 
+  // Dev only: ?debug=...&auto=1 makes a bot answer every question correctly.
+  const DEBUG_AUTO = typeof location !== 'undefined' && new URLSearchParams(location.search).get('auto') === '1';
+
   let highScore = 0;
   try { highScore = parseInt(localStorage.getItem('mx.highscore') || '0', 10) || 0; } catch (e) { /* storage unavailable */ }
   function saveHighScore(score) {
@@ -487,6 +490,10 @@
           if (sec <= 5 && sec > 0) A.sfx.tick();
         }
         if (this.timer <= 0) { this.timer = 0; this.timeout(); }
+        if (DEBUG_AUTO && this.phase === 'ask' && this.timeMax - this.timer > 0.5) {
+          const right = this.asteroids.find((a) => a.value === this.q.a * this.q.b && a.state === 'in');
+          if (right) this.choose(right);
+        }
         for (const ev of events) {
           if (this.phase !== 'ask') break;
           if (ev.type === 'click') {
@@ -702,7 +709,7 @@
       go(scene, ...args);
       // &pre=N pre-solves N questions of the level (to reach line/bingo fast).
       const pre = parseInt(new URLSearchParams(location.search).get('pre'), 10) || 0;
-      for (let i = 0; i < pre && play.round && !play.round.done; i++) play.round.answerCorrect();
+      for (let i = 0; i < Math.min(pre, 99) && play.round; i++) play.round.answerCorrect();
     },
     update(dt, events) {
       game.drawDt = game.paused ? 0 : dt;
