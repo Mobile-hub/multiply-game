@@ -105,7 +105,7 @@
   let planetTimer = 2;
   function spawnPlanet(x) {
     const r = Math.floor(rand(8, 22));
-    planets.push({ img: makePlanet(r, pick(PLANET_TYPES)), x: x === undefined ? W + 40 : x, y: rand(20, H - 30), speed: rand(3, 7) });
+    planets.push({ img: makePlanet(r, pick(PLANET_TYPES)), x: x === undefined ? W + 40 : x, y: rand(75, H - 25), speed: rand(3, 7) });
   }
   spawnPlanet(rand(60, 260));
 

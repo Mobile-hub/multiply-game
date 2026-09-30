@@ -128,13 +128,13 @@
 
   // ---------- Spider robot ----------
   const SPIDER_SAY = {
-    correct: ['¡BIEN!', '¡GENIAL!', '¡SÚPER!', '¡ASÍ SE HACE!', '¡CRACK!', '¡BRUTAL!', '¡PERFECTO!'],
-    wrong: ['¡UPS!', '¡ÁNIMO!', '¡TÚ PUEDES!', '¡SIGUE!', '¡NO PASA NADA!'],
-    timeout: ['¡RÁPIDO!', '¡SE ACABÓ EL TIEMPO!', '¡DESPIERTA!'],
-    line: ['¡LÍNEA!', '¡TABLA COMPLETA!', '¡INCREÍBLE!'],
-    bingo: ['¡BINGO!', '¡LO LOGRASTE!'],
-    idle: ['¡VAMOS!', 'BIP BOP', '¡A POR ELLOS!', '¡CONCÉNTRATE!'],
-    boss: ['¡CUIDADO!', '¡ES ENORME!', '¡A POR ÉL!'],
+    correct: ['NICE!', 'GREAT!', 'SUPER!', 'WELL DONE!', 'AWESOME!', 'BOOM!', 'PERFECT!'],
+    wrong: ['OOPS!', 'KEEP GOING!', 'YOU CAN DO IT!', 'TRY AGAIN!', 'NO WORRIES!'],
+    timeout: ['FASTER!', 'OUT OF TIME!', 'WAKE UP!'],
+    line: ['LINE!', 'TABLE DONE!', 'AMAZING!'],
+    bingo: ['BINGO!', 'YOU DID IT!'],
+    idle: ["LET'S GO!", 'BEEP BOOP', 'GET THEM!', 'FOCUS!'],
+    boss: ['WATCH OUT!', "IT'S HUGE!", 'GET IT!'],
   };
 
   class Spider {

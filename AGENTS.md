@@ -3,7 +3,7 @@
 Guía para agentes (Claude Code u otros) que trabajen en este repositorio.
 
 ## Reglas
-- Código, identificadores y comentarios en **inglés**. Textos visibles del juego en **castellano**.
+- Código, identificadores, documentación y comentarios en **inglés**, Textos visibles del juego en **inglés**. Conversaciones y planes de desarrollo en **castellano**. Los ficheros que se haga commit en **inglés**.
 - Sin dependencias, sin build, sin red: HTML + CSS + JS clásico (`<script>` normales, NO módulos ES) para que funcione abriendo `index.html` vía `file://`. Todo cuelga del namespace global `window.MX`.
 - Licencia MIT. Commits pequeños y frecuentes.
 - `make open` abre el juego, `make test` ejecuta tests con node, `make check` valida sintaxis.
