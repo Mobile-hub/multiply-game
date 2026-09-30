@@ -7,15 +7,18 @@
 
   function resize() {
     const s = Math.min(window.innerWidth / canvas.width, window.innerHeight / canvas.height);
-    const scale = s >= 1 ? Math.floor(s) || 1 : s;
-    canvas.style.width = canvas.width * scale + 'px';
-    canvas.style.height = canvas.height * scale + 'px';
+    // Integer scaling keeps pixels crisp on big screens; small (phone) screens use all the space.
+    const scale = s >= 3 ? Math.floor(s) : s;
+    canvas.style.width = Math.floor(canvas.width * scale) + 'px';
+    canvas.style.height = Math.floor(canvas.height * scale) + 'px';
   }
   window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', () => setTimeout(resize, 200));
   resize();
 
   MX.input.init(canvas);
-  MX.input.onFirstInteraction(() => MX.audio.unlock());
+  MX.input.onInteraction(() => MX.audio.unlock());
+  document.addEventListener('visibilitychange', () => { if (document.hidden) MX.game.autoPause(); });
 
   MX.game.init();
 
@@ -25,6 +28,11 @@
     MX.game.update(1 / 60, []);
     if (i % 6 === 0) MX.game.draw(ctx); // keeps timed visual effects (lasers, flashes) consistent
   }
+  // Dev shortcut: &keys=54 simulates typing those keys after the fast-forward.
+  for (const k of new URLSearchParams(location.search).get('keys') || '') {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: k }));
+  }
+  if (warm) MX.game.update(1 / 60, MX.input.poll());
 
   let last = performance.now();
   function frame(now) {

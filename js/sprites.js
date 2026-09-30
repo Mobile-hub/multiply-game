@@ -121,9 +121,15 @@
         ctx.fillRect(Math.round(a.x + Math.cos(ang) * r), Math.round(a.y + Math.sin(ang) * r), 1, 1);
       }
     }
-    MX.font.drawText(ctx, String(a.value), a.x + 1, a.y - 3, {
+    const label = String(a.value);
+    const lx = MX.font.drawText(ctx, label, a.x + 1, a.y - 3, {
       scale: 1, align: 'center', color: a.flash > 0 ? '#ff3b3b' : '#ffffff', outline: '#1a1030',
     });
+    // Digits typed so far on the keyboard light up in yellow.
+    if (a.match) {
+      const x0 = Math.round(a.x + 1 - Math.floor(lx / 2));
+      MX.font.drawText(ctx, label.slice(0, a.match), x0, a.y - 3, { color: '#ffd23f' });
+    }
   }
 
   // ---------- Spider robot ----------

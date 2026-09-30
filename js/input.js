@@ -1,11 +1,11 @@
-// Pointer (mouse/touch) and keyboard input mapped into low-res canvas coordinates.
+// Pointer (mouse/touch/pen) and keyboard input mapped into low-res canvas coordinates.
 (function () {
   const MX = (window.MX = window.MX || {});
 
   const events = [];
   const pointer = { x: -100, y: -100 };
   let canvas = null;
-  let firstInteraction = null;
+  let interactionCb = null;
 
   function toCanvas(clientX, clientY) {
     const r = canvas.getBoundingClientRect();
@@ -15,12 +15,9 @@
     };
   }
 
+  // Called on every user gesture: mobile browsers (iOS Safari) only unlock audio inside one.
   function interacted() {
-    if (firstInteraction) {
-      const cb = firstInteraction;
-      firstInteraction = null;
-      cb();
-    }
+    if (interactionCb) interactionCb();
   }
 
   function init(c) {
@@ -34,15 +31,26 @@
       events.push({ type: 'click', x: p.x, y: p.y });
     });
     canvas.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
       const p = toCanvas(e.clientX, e.clientY);
       pointer.x = p.x;
       pointer.y = p.y;
     });
+    // Touch has no hover: forget the finger position once it lifts.
+    const release = (e) => {
+      if (e.pointerType !== 'mouse') { pointer.x = -100; pointer.y = -100; }
+    };
+    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointercancel', release);
+    canvas.addEventListener('touchend', interacted, { passive: true });
+    // Block long-press menu, double-tap zoom and scrolling on mobile.
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
     window.addEventListener('keydown', (e) => {
       if (e.repeat) return;
       interacted();
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-      if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(key)) e.preventDefault();
+      if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Backspace'].includes(key)) e.preventDefault();
       events.push({ type: 'key', key });
     });
   }
@@ -51,13 +59,13 @@
     return events.splice(0, events.length);
   }
 
-  function onFirstInteraction(cb) {
-    firstInteraction = cb;
+  function onInteraction(cb) {
+    interactionCb = cb;
   }
 
   function inRect(p, r) {
     return p.x >= r.x && p.x < r.x + r.w && p.y >= r.y && p.y < r.y + r.h;
   }
 
-  MX.input = { init, poll, pointer, onFirstInteraction, inRect };
+  MX.input = { init, poll, pointer, onInteraction, inRect };
 })();

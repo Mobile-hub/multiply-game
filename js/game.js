@@ -22,7 +22,9 @@
   const SHIP_POS = { x: 16, y: 88 };
   const LEVEL_SLOTS = [{ x: 118, y: 96 }, { x: 170, y: 134 }, { x: 222, y: 96 }, { x: 274, y: 134 }];
   const BOSS_SLOTS = [{ x: 96, y: 92 }, { x: 140, y: 134 }, { x: 184, y: 92 }, { x: 228, y: 134 }];
-  const MUTE_RECT = { x: 305, y: 1, w: 14, h: 11 };
+  const MUTE_RECT = { x: 305, y: 1, w: 14, h: 12 };
+  const PAUSE_RECT = { x: 246, y: 1, w: 14, h: 12 };
+  const HIT_R = S.ASTEROID_R + 7; // generous touch target
 
   // Dev only: ?debug=...&auto=1 makes a bot answer every question correctly.
   const DEBUG_AUTO = typeof location !== 'undefined' && new URLSearchParams(location.search).get('auto') === '1';
@@ -283,6 +285,26 @@
       this.lastTick = Math.ceil(this.timer);
       this.phase = 'ask';
       this.questionPop = 0.25;
+      this.typed = '';
+    },
+
+    liveAsteroids() { return this.asteroids.filter((a) => a.state === 'in'); },
+
+    // Desktop keyboard: type the answer; matching digits light up on the asteroids.
+    typeKey(key) {
+      const live = this.liveAsteroids();
+      const values = live.map((a) => a.value);
+      if (key === 'Backspace') { this.typed = this.typed.slice(0, -1); return; }
+      if (key === 'Enter') {
+        const v = Q.exactMatch(values, this.typed);
+        if (v !== null) this.choose(live.find((a) => a.value === v));
+        return;
+      }
+      const res = Q.typeDigit(values, this.typed, key);
+      this.typed = res.typed;
+      if (res.rejected) { A.sfx.reject(); return; }
+      A.sfx.type();
+      if (res.commit !== null) this.choose(live.find((a) => a.value === res.commit));
     },
 
     choose(ast) {
@@ -469,7 +491,9 @@
             a.y += (dy / d) * sp;
           }
         }
-        a.hover = this.phase === 'ask' && Math.hypot(pointer.x - a.x, pointer.y - a.y) < S.ASTEROID_R + 3;
+        const typing = this.phase === 'ask' && this.typed && String(a.value).startsWith(this.typed);
+        a.match = typing ? this.typed.length : 0;
+        a.hover = this.phase === 'ask' && (typing || Math.hypot(pointer.x - a.x, pointer.y - a.y) < HIT_R);
       }
       // Only drop asteroids that are gone for good; incoming ones start off-screen on the right.
       this.asteroids = this.asteroids.filter((a) => a.state !== 'dead' && !(a.state === 'leave' && a.x > W + 30));
@@ -497,11 +521,15 @@
         for (const ev of events) {
           if (this.phase !== 'ask') break;
           if (ev.type === 'click') {
-            const hit = this.asteroids.find((a) => a.state === 'in' && Math.hypot(ev.x - a.x, ev.y - a.y) < S.ASTEROID_R + 3);
+            // Nearest asteroid within a generous radius, so fingers do not need to be precise.
+            let hit = null, best = HIT_R;
+            for (const a of this.liveAsteroids()) {
+              const d = Math.hypot(ev.x - a.x, ev.y - a.y);
+              if (d < best) { best = d; hit = a; }
+            }
             if (hit) this.choose(hit);
-          } else if (ev.type === 'key' && ['1', '2', '3', '4'].includes(ev.key)) {
-            const a = this.asteroids[parseInt(ev.key, 10) - 1];
-            if (a && a.state === 'in') this.choose(a);
+          } else if (ev.type === 'key' && (/^[0-9]$/.test(ev.key) || ev.key === 'Backspace' || ev.key === 'Enter')) {
+            this.typeKey(ev.key);
           }
         }
       } else if (this.phase === 'resolve') {
@@ -590,6 +618,7 @@
         const label = k < 0 ? 'GET READY!' : ['3', '2', '1', 'GO!'][Math.min(k, 3)];
         drawText(ctx, label, W / 2, 96, { scale: 2, align: 'center', color: '#ffffff', outline: '#1a1030' });
         drawText(ctx, this.timeMax + ' SECONDS PER QUESTION', W / 2, 124, { align: 'center', color: '#8a8ad0' });
+        drawText(ctx, 'TAP THE ASTEROID OR TYPE THE ANSWER', W / 2, 136, { align: 'center', color: '#5a5a9e' });
       }
 
       if (this.q && this.phase !== 'intro' && this.phase !== 'bingo' && this.phase !== 'bossDeath') {
@@ -711,6 +740,10 @@
       const pre = parseInt(new URLSearchParams(location.search).get('pre'), 10) || 0;
       for (let i = 0; i < Math.min(pre, 99) && play.round; i++) play.round.answerCorrect();
     },
+    // Called when the tab/app goes to background (e.g. phone call, app switch).
+    autoPause() {
+      if (canPause() && !game.paused) setPaused(true);
+    },
     update(dt, events) {
       game.drawDt = game.paused ? 0 : dt;
       const rest = [];
@@ -719,7 +752,9 @@
           A.toggleMute();
           continue;
         }
-        if (ev.type === 'key' && (ev.key === 'p' || ev.key === 'Escape') && canPause() && (game.paused || ev.key === 'p' || play.phase === 'ask')) {
+        const pauseKey = ev.type === 'key' && (ev.key === 'p' || ev.key === 'Escape') && (game.paused || ev.key === 'p' || play.phase === 'ask');
+        const pauseTap = ev.type === 'click' && inRect(ev, PAUSE_RECT) && !game.paused;
+        if ((pauseKey || pauseTap) && canPause()) {
           setPaused(!game.paused);
           continue;
         }
@@ -750,6 +785,12 @@
       ctx.restore();
       fx.drawFlash(ctx, game.drawDt);
       S.drawSpeaker(ctx, MUTE_RECT.x + 2, MUTE_RECT.y + 1, A.isMuted());
+      if (canPause() && !game.paused) {
+        // On-screen pause button (touch devices have no P key).
+        ctx.fillStyle = '#dfe8ff';
+        ctx.fillRect(PAUSE_RECT.x + 4, PAUSE_RECT.y + 2, 2, 7);
+        ctx.fillRect(PAUSE_RECT.x + 8, PAUSE_RECT.y + 2, 2, 7);
+      }
       if (game.paused) {
         ctx.fillStyle = 'rgba(5,3,15,0.75)';
         ctx.fillRect(0, 0, W, H);

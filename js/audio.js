@@ -72,6 +72,8 @@
 
   const sfx = {
     select() { tone(880, 0.06, { vol: 0.2 }); tone(1320, 0.06, { vol: 0.2, delay: 0.05 }); },
+    type() { tone(1100, 0.04, { vol: 0.15 }); },
+    reject() { tone(160, 0.08, { vol: 0.15, type: 'triangle' }); },
     start() { arp([60, 64, 67, 72, 76, 79, 84], 0.05, { vol: 0.25 }); },
     laser() { tone(1400, 0.16, { slide: 180, vol: 0.22 }); tone(700, 0.16, { slide: 90, vol: 0.12, type: 'sawtooth' }); },
     explode() { noise(0.5, { freq: 3000, freqTo: 100, vol: 0.55 }); tone(120, 0.35, { slide: 30, type: 'triangle', vol: 0.5 }); },

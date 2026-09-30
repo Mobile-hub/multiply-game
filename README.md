@@ -24,15 +24,17 @@ make serve   # or serve it on http://localhost:8000
 - **Final boss**: after Level 3, defeat the space monster (20 hits) at 5 seconds per question.
 - 5 lives. High score is saved in the browser.
 - The spider robot in the bottom-left corner cheers you on (it never gives hints).
+- Works on phones and tablets: tap to play, best in landscape. The game pauses itself when the app goes to the background.
 
 ## Controls
 
 | Action | Input |
 | --- | --- |
-| Shoot an asteroid | Click / tap, or keys `1`–`4` (left to right) |
+| Shoot an asteroid | Click / tap it, or **type its number** on the keyboard |
+| Typing | Matching digits light up on the asteroids; the shot fires as soon as only one number fits. Digits that match nothing are ignored. `Backspace` deletes, `Enter` confirms when one number is a prefix of another (e.g. `6` vs `60`) |
 | Choose level in menu | Click, arrows or `1`–`3` |
 | Start / confirm | `Enter` / `Space` |
-| Pause | `P` (or `Esc` while playing) |
+| Pause | `P`, `Esc` or the ⏸ button on screen |
 | Sound on/off | `M` or the speaker icon |
 
 ## Development
@@ -58,7 +60,7 @@ tests/           node tests
 ```
 
 Debug URL parameters (dev only): `index.html?debug=1|2|3|boss|warp|gameover|victory`,
-plus `&t=N` (fast-forward N seconds), `&pre=N` (pre-solve N questions) and `&auto=1` (bot answers correctly).
+plus `&t=N` (fast-forward N seconds), `&pre=N` (pre-solve N questions), `&auto=1` (bot answers correctly) and `&keys=54` (simulate typing).
 
 ## License
 
