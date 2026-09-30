@@ -94,7 +94,25 @@
     }
   }
 
-  const api = { SIZE, shuffle, allPairs, makeOptions, Round, EndlessDeck };
+  // Keyboard answer entry. Given the values on screen and the digits typed so far, apply a new digit:
+  // - no value starts with the new prefix -> rejected, buffer cleared, nothing is chosen
+  // - exactly one value can still match and it equals the prefix -> commit that value
+  // - otherwise keep typing (e.g. "5" with 55 and 54 on screen)
+  function typeDigit(values, typed, digit) {
+    const cand = typed + digit;
+    const matches = values.filter((v) => String(v).startsWith(cand));
+    if (!matches.length) return { typed: '', matches: [], commit: null, rejected: true };
+    const exact = matches.find((v) => String(v) === cand);
+    return { typed: cand, matches, commit: exact !== undefined && matches.length === 1 ? exact : null, rejected: false };
+  }
+
+  // Enter confirms an ambiguous exact prefix, e.g. "6" when both 6 and 60 are on screen.
+  function exactMatch(values, typed) {
+    const v = values.find((x) => typed !== '' && String(x) === typed);
+    return v === undefined ? null : v;
+  }
+
+  const api = { SIZE, shuffle, allPairs, makeOptions, Round, EndlessDeck, typeDigit, exactMatch };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else (root.MX = root.MX || {}).questions = api;
 })(typeof window !== 'undefined' ? window : globalThis);

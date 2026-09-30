@@ -108,4 +108,56 @@ test('endless deck never repeats back-to-back', () => {
   }
 });
 
+function typeAll(values, digits) {
+  let typed = '', res = null;
+  for (const d of digits) {
+    res = Q.typeDigit(values, typed, d);
+    typed = res.typed;
+    if (res.commit !== null) break;
+  }
+  return res;
+}
+
+test('typing: 6x9 with 20,66,55,54 -> "5" waits, "53" ignored', () => {
+  const v = [20, 66, 55, 54];
+  const r1 = Q.typeDigit(v, '', '5');
+  assert.deepStrictEqual(r1.matches.sort(), [54, 55]);
+  assert.strictEqual(r1.commit, null);
+  const r2 = Q.typeDigit(v, r1.typed, '3');
+  assert.ok(r2.rejected);
+  assert.strictEqual(r2.typed, '');
+  assert.strictEqual(r2.commit, null);
+});
+
+test('typing: "55" commits 55 (wrong), "54" commits 54 (right)', () => {
+  const v = [20, 66, 55, 54];
+  assert.strictEqual(typeAll(v, '55').commit, 55);
+  assert.strictEqual(typeAll(v, '54').commit, 54);
+});
+
+test('typing: single-digit answer commits at once when unambiguous', () => {
+  assert.strictEqual(typeAll([5, 6, 7, 8], '6').commit, 6);
+});
+
+test('typing: ambiguous prefix waits, Enter confirms exact', () => {
+  const r = Q.typeDigit([6, 60, 7, 8], '', '6');
+  assert.strictEqual(r.commit, null);
+  assert.strictEqual(Q.exactMatch([6, 60, 7, 8], r.typed), 6);
+  assert.strictEqual(typeAll([6, 60, 7, 8], '60').commit, 60);
+  assert.strictEqual(Q.exactMatch([6, 60], ''), null);
+});
+
+test('typing: three digits for 100', () => {
+  const v = [100, 90, 110, 99];
+  const r = Q.typeDigit(v, '1', '0');
+  assert.strictEqual(r.commit, null);
+  assert.strictEqual(typeAll(v, '100').commit, 100);
+});
+
+test('typing: first digit with no match is ignored', () => {
+  const r = Q.typeDigit([20, 66, 55, 54], '', '3');
+  assert.ok(r.rejected);
+  assert.strictEqual(r.typed, '');
+});
+
 console.log(`\n${passed} tests passed` + (process.exitCode ? ' (with failures)' : ''));
