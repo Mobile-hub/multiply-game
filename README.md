@@ -1,5 +1,11 @@
 # Multiply 🚀
 
+![Menu](screenshots/menu.png)
+
+| | |
+| --- | --- |
+| ![Level 2](screenshots/gameplay-1.png) | ![Final boss](screenshots/gameplay-2.png) |
+
 A tiny 8-bit, space-themed arcade game to practise the multiplication tables from 1 to 10.
 Pure HTML + CSS + JavaScript: no dependencies, no build step, no network. Works offline by opening `index.html`.
 
@@ -22,7 +28,7 @@ make serve   # or serve it on http://localhost:8000
 - **Level up**: answer all 100 multiplications (1×1 … 10×10) correctly, in random order.
 - **Bingo card** (top left): each correct answer lights a cell. Completing a whole table gives a **LINE!** bonus (+500 and +1 life). Completing the whole card is **BINGO!**, and you jump through hyperspace to the next level.
 - **Final boss**: after Level 3, defeat the space monster (20 hits) at 5 seconds per question.
-- 5 lives. High score is saved in the browser.
+- 5 lives. The device's best final score is saved in the browser.
 - The spider robot in the bottom-left corner cheers you on (it never gives hints).
 - Works on phones and tablets: tap to play, best in landscape. The game pauses itself when the app goes to the background.
 
@@ -36,6 +42,10 @@ make serve   # or serve it on http://localhost:8000
 | Start / confirm | `Enter` / `Space` |
 | Pause | `P`, `Esc` or the ⏸ button on screen |
 | Sound on/off | `M` or the speaker icon |
+
+## Privacy
+
+Only the best final score on this device (and the sound on/off setting) is saved, in the browser's `localStorage`. The game uses **no cookies**, needs no account and sends nothing anywhere.
 
 ## Development
 

@@ -22,7 +22,7 @@ Guide for agents (Claude Code or others) working in this repository.
 - Final boss with 20 HP, random questions at 5 s.
 - Animated spider-robot in the bottom-left corner that reacts (never gives hints).
 - Animations: parallax stars, planets, hyperspace, particle explosions, shake, floating texts, combos.
-- High score in `localStorage` (with try/catch).
+- Only the device's best final score (plus the mute setting) in `localStorage` (with try/catch). **No cookies**, nothing leaves the browser.
 
 ### Structure
 ```
