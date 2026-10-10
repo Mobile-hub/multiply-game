@@ -1,13 +1,13 @@
 # Multiply 🚀
 
+A tiny 8-bit, space-themed arcade game to practise the multiplication tables from 1 to 10.
+Pure HTML + CSS + JavaScript: no dependencies, no build step, no network. Works offline by opening `index.html`.
+
 ![Menu](screenshots/menu.png)
 
 | | |
 | --- | --- |
 | ![Level 2](screenshots/gameplay-1.png) | ![Final boss](screenshots/gameplay-2.png) |
-
-A tiny 8-bit, space-themed arcade game to practise the multiplication tables from 1 to 10.
-Pure HTML + CSS + JavaScript: no dependencies, no build step, no network. Works offline by opening `index.html`.
 
 ## Play
 
