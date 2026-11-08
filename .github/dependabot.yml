@@ -1,0 +1,8 @@
+# This game has no package manifests, so GitHub Actions is the only ecosystem to watch.
+# If a manifest is ever added (for example package.json), add its ecosystem here.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
